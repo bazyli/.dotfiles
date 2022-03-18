@@ -1,0 +1,87 @@
+- hosts: localhost
+  become: true
+  vars:
+      local_home: "{{ lookup('env','HOME') }}"
+      local_user: "{{ lookup('env','USER') }}"
+  vars_files:
+      - keys/id
+      - keys/git
+      - keys/leo
+  pre_tasks:
+      - name: Update cache
+        apt:
+            update_cache: true
+  tasks:
+      - name: Install essentials
+        apt:
+            name:
+                - 'git'
+                - 'zsh'
+                - 'curl'
+                - 'stow'
+                - 'nodejs'
+                - 'npm'
+        tags:
+            - essentials
+      - name: Change shell
+        shell: chsh -s `which zsh`
+        tags:
+            - zsh
+      - name: Install ohmyzsh
+        shell: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+        tags:
+            - zsh
+      - name: Install n
+        npm:
+            name: n
+            global: true
+        tags:
+            - node
+      - name: Select node version 14
+        shell: n 14
+        tags:
+            - node
+      - name: Install typescript
+        npm:
+            name: typescript
+            global: true
+        tags:
+            - node
+      - name: Install typescript language server
+        npm:
+            name: typescript-language-server
+            global: true
+        tags:
+            - node
+      - name: Install prettier
+        npm:
+            name: prettier
+            global: true
+        tags:
+            - node
+      - name: Install eslint
+        npm:
+            name: eslint
+            global: true
+        tags:
+            - node
+      - name: Install solidity language server
+        npm:
+            name: solidity-language-server
+            global: true
+        tags:
+            - node
+      - name: Install solidity prettifier
+        npm:
+            name: prettier-plugin-solidity
+            global: true
+        tags:
+            - node
+      - name: Install rust
+        shell: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+        tags:
+            - rust
+      - name: Install rust language server
+        shell: PATH=$PATH:~/.cargo/bin rustup update && PATH=$PATH:~/.cargo/bin rustup component add rls rust-analysis rust-src
+        tags:
+            - rust
